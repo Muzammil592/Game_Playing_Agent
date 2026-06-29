@@ -1,22 +1,193 @@
-Game 1 — Tic-Tac-Toe (Day 1)
-Classic 3x3 board game. Two players take turns placing X and O, first to get 3 in a row wins.
-The AI learns by playing against itself hundreds of thousands of times. It starts completely random — placing pieces anywhere — and slowly figures out which moves lead to wins and which lead to losses. After 300,000 games of self-play, it knows every possible board position and the best move in each one. The entire game tree fits in a dictionary (Q-table) because there are only ~5,478 legal board states. No neural network needed — pure lookup table.
-What the AI learned: Block opponent threats, take the center, force forks. Beat it if you can — after the reward bug fix, it plays near-perfectly.
+# Reinforcement Learning Games Collection
 
-Game 2 — CartPole (Day 2)
-A pole is balanced on top of a moving cart on a track. The AI controls the cart — push left or push right — to keep the pole from falling. Score = how many steps the pole stays upright. Max is 500.
-This is where the Q-table breaks. The cart's position, velocity, pole angle, and angular velocity are all continuous floating point numbers — infinite possible combinations, impossible to enumerate in a dict. Session 3 tried discretizing (binning) the state into a Q-table anyway and hit a ceiling of ~88/500. Session 4 replaced the table with a PyTorch neural network (DQN) that learns to approximate Q-values for any state it's never seen. Training for ~1000 episodes gets it to 475+/500 — essentially perfect balance.
-What the AI learned: Feel the pole leaning and correct before it falls. Counter-intuitive moves like moving away from center to create corrective momentum.
+A collection of three reinforcement learning projects demonstrating the progression from tabular Q-learning to Deep Q-Networks (DQN) and advanced DQN architectures. Each game introduces increasingly complex environments and showcases how AI agents learn through experience.
 
-Game 3 — LunarLander (Day 3)
-A rocket ship must land safely on a landing pad on the moon. The AI controls 4 actions — fire left engine, fire main engine, fire right engine, or do nothing. It gets rewarded for landing on the pad (+200), penalized for crashing (-100), and loses small points every time it fires an engine (fuel costs money).
-This is the hardest of the three. 8-dimensional continuous state, delayed rewards, physics simulation with gravity and inertia. Session 5 applied the same DQN from CartPole — just bigger network (256 hidden units instead of 128) and bigger replay buffer. Session 6 ran three variants side by side:
+---
 
-Vanilla DQN — baseline, tends to overestimate how good situations are
-Double DQN — 2-line fix, uses one network to pick the action and another to score it, removes overestimation bias
-Dueling DQN — splits into two streams, one learning how good the position is (V) and one learning how good each action is (A), better at spotting when any action is roughly equal
+## 🎮 Game 1 — Tic-Tac-Toe (Day 1)
 
-What the AI learned: Kill horizontal velocity first, then descend slowly, fire main engine in short bursts, align with pad, touch down with legs not body.
+Classic 3×3 board game where two players take turns placing **X** and **O**. The first player to align three symbols horizontally, vertically, or diagonally wins.
 
-The Full Progression
-Tic-Tac-ToeCartPoleLunarLanderState9 cells, discrete4 floats, continuous8 floats, continuousActions9 (any empty cell)2 (left / right)4 (engines)AgentQ-table (dict)Neural net (DQN)Neural net (Double/Dueling DQN)OpponentItself (self-play)PhysicsPhysics + fuel costSolved when97% win rateAvg 475/500 stepsAvg 200+ rewardKey challengeReward assignment bugContinuous state spaceDelayed rewards + fuel penalty
+### Environment
+
+* **State Space:** 9 board cells (discrete)
+* **Actions:** Any empty cell
+* **Agent:** Q-Table (Dictionary)
+* **Training Method:** Self-play
+
+### Learning Process
+
+The agent begins with completely random moves and learns entirely through self-play. By playing hundreds of thousands of games against itself, it gradually discovers which actions lead to victories and which result in losses.
+
+After approximately **300,000 training games**, the agent learns nearly every possible board configuration and stores the optimal action for each state.
+
+Since Tic-Tac-Toe contains only around **5,478 legal board states**, the entire game can be solved using a lookup table without requiring neural networks.
+
+### What the AI Learned
+
+* Block opponent winning moves.
+* Prioritize the center position.
+* Create forks and multiple winning opportunities.
+* Recognize forced wins and draws.
+
+**Performance:** Near-perfect play after reward function corrections.
+
+---
+
+## 🎯 Game 2 — CartPole (Day 2)
+
+CartPole is a classic control problem where a pole is balanced on top of a moving cart. The agent must move the cart left or right to prevent the pole from falling.
+
+### Environment
+
+* **State Space:** 4 continuous variables
+
+  * Cart position
+  * Cart velocity
+  * Pole angle
+  * Pole angular velocity
+* **Actions:** Left or Right
+* **Maximum Score:** 500 steps
+
+### Challenge
+
+Unlike Tic-Tac-Toe, CartPole uses continuous state values, making a traditional Q-table impractical.
+
+Initial attempts using state discretization achieved only around **88/500** average score.
+
+To overcome this limitation, the project implements a **Deep Q-Network (DQN)** using PyTorch. The neural network estimates Q-values for unseen states, allowing the agent to generalize.
+
+### Network Architecture
+
+* Fully connected neural network
+* Hidden layers: 128 units
+* Experience replay
+* Target network updates
+
+### Training Results
+
+* Approximately 1000 training episodes
+* Average score exceeding **475/500**
+
+### What the AI Learned
+
+* Detect pole movement before failure occurs.
+* Generate corrective momentum.
+* Make counter-intuitive movements away from the center to maintain balance.
+
+**Performance:** Near-perfect balancing behavior.
+
+---
+
+## 🚀 Game 3 — LunarLander (Day 3)
+
+LunarLander is a complex physics-based environment where a spacecraft must land safely on a designated landing pad.
+
+### Environment
+
+* **State Space:** 8 continuous variables
+* **Actions:**
+
+  * Do nothing
+  * Fire left engine
+  * Fire main engine
+  * Fire right engine
+
+### Reward System
+
+* Safe landing: **+200**
+* Crash: **−100**
+* Engine usage: Small negative reward (fuel cost)
+
+### Challenges
+
+* High-dimensional continuous state space.
+* Delayed rewards.
+* Gravity and inertia.
+* Fuel management.
+
+### Deep Reinforcement Learning Approaches
+
+#### Vanilla DQN
+
+Standard Deep Q-Network implementation that tends to overestimate action values.
+
+#### Double DQN
+
+Uses one network for action selection and another for evaluation, reducing overestimation bias.
+
+#### Dueling DQN
+
+Separates learning into:
+
+* State value function (V)
+* Action advantage function (A)
+
+This architecture improves learning in situations where multiple actions produce similar outcomes.
+
+### Network Improvements
+
+* Hidden layer size increased to 256 units.
+* Larger replay buffer.
+* Improved stability and convergence.
+
+### What the AI Learned
+
+* Eliminate horizontal velocity first.
+* Descend slowly.
+* Use short engine bursts.
+* Align with the landing pad.
+* Land on the legs instead of the body.
+
+**Performance:** Average reward exceeding 200, indicating successful landings.
+
+---
+
+# 📈 Learning Progression
+
+| Feature         | Tic-Tac-Toe        | CartPole               | LunarLander          |
+| --------------- | ------------------ | ---------------------- | -------------------- |
+| State Space     | 9 cells (discrete) | 4 continuous values    | 8 continuous values  |
+| Actions         | 9 possible moves   | 2 actions              | 4 actions            |
+| Agent Type      | Q-Table            | Deep Q-Network         | Double/Dueling DQN   |
+| Opponent        | Self-play          | Physics environment    | Physics + fuel costs |
+| Solved When     | 97% win rate       | 475+/500 score         | 200+ average reward  |
+| Main Challenge  | Reward assignment  | Continuous state space | Delayed rewards      |
+| Learning Method | Tabular Q-learning | Deep Q-Learning        | Advanced DQN         |
+
+---
+
+# 🧠 Key Concepts Covered
+
+* Reinforcement Learning
+* Q-Learning
+* Self-Play Training
+* Deep Q-Networks (DQN)
+* Experience Replay
+* Target Networks
+* Double DQN
+* Dueling DQN
+* Reward Engineering
+* Continuous State Spaces
+
+---
+
+# 🛠 Technologies Used
+
+* Python
+* PyTorch
+* NumPy
+* OpenAI Gym / Gymnasium
+* Matplotlib
+
+---
+
+# 📚 Project Goal
+
+This project demonstrates the evolution of reinforcement learning techniques:
+
+1. **Tabular Q-Learning** for small, discrete environments.
+2. **Deep Q-Networks** for continuous environments.
+3. **Advanced DQN variants** for complex physics simulations.
+
+The progression illustrates why simple lookup tables fail in large environments and how neural networks enable agents to learn and generalize across infinite state spaces.

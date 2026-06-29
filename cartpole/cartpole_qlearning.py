@@ -2,11 +2,15 @@
 Session 3: CartPole-v1 solved with discretized Q-Learning
 Discretizes the continuous 4D state space into bins so we can use a Q-table.
 """
+from pathlib import Path
 import numpy as np
 import gymnasium as gym
 import pickle
 import matplotlib.pyplot as plt
 from collections import deque
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 # ─── Discretization ────────────────────────────────────────────────────────────
@@ -106,7 +110,7 @@ def train(episodes=5_000, log_every=200):
                 break
 
     env.close()
-    agent.save("cartpole_agent.pkl")
+    agent.save(BASE_DIR / "cartpole_agent.pkl")
 
     # Plot training curve
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -124,7 +128,7 @@ def train(episodes=5_000, log_every=200):
     ax.legend(facecolor='#1a1d2e', labelcolor='#c8cad4', edgecolor='#2a2d3e')
     for sp in ax.spines.values(): sp.set_edgecolor('#2a2d3e')
     plt.tight_layout()
-    plt.savefig('cartpole_training.png', dpi=150, bbox_inches='tight',
+    plt.savefig(BASE_DIR / 'cartpole_training.png', dpi=150, bbox_inches='tight',
                 facecolor=fig.get_facecolor())
     print("Plot saved → cartpole_training.png")
     return agent, scores
@@ -134,7 +138,7 @@ def train(episodes=5_000, log_every=200):
 def evaluate(n_episodes=10):
     env   = gym.make('CartPole-v1')
     agent = CartPoleQAgent()
-    agent.load("cartpole_agent.pkl")
+    agent.load(BASE_DIR / "cartpole_agent.pkl")
     scores = []
 
     for ep in range(n_episodes):

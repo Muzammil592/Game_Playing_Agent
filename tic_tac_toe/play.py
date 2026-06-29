@@ -1,13 +1,17 @@
 """
 Play against the trained X-agent (you are O).
 """
+from pathlib import Path
 from env import TicTacToeEnv
 from agent import QLearningAgent
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 def play():
     env = TicTacToeEnv()
     agent = QLearningAgent()
-    agent.load("x_agent.pkl")
+    agent.load(BASE_DIR / "x_agent.pkl")
 
     print("\n=== Tic-Tac-Toe vs AI ===")
     print("You are O. Enter positions 0-8 (top-left → bottom-right).\n")

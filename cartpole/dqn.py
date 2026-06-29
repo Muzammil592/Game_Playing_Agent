@@ -1,10 +1,11 @@
 """
 Session 4: Deep Q-Network (DQN) for CartPole-v1
 Components:
-  - Neural network to approximate Q(s,a)
-  - Replay buffer to break correlation between samples
-  - Target network for stable training
+    - Neural network to approximate Q(s,a)
+    - Replay buffer to break correlation between samples
+    - Target network for stable training
 """
+from pathlib import Path
 import numpy as np
 import gymnasium as gym
 import torch
@@ -13,6 +14,9 @@ import torch.optim as optim
 import random
 import matplotlib.pyplot as plt
 from collections import deque
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 # ─── Device ────────────────────────────────────────────────────────────────────
@@ -132,11 +136,11 @@ class DQNAgent:
 
     def save(self, path):
         torch.save({'online': self.online_net.state_dict(),
-                    'target': self.target_net.state_dict()}, path)
+                    'target': self.target_net.state_dict()}, Path(path))
         print(f"DQN saved → {path}")
 
     def load(self, path):
-        d = torch.load(path, map_location=device)
+        d = torch.load(Path(path), map_location=device)
         self.online_net.load_state_dict(d['online'])
         self.target_net.load_state_dict(d['target'])
         self.epsilon = self.epsilon_min
@@ -192,7 +196,7 @@ def train(episodes=600, log_every=50, solve_threshold=475):
                 print(f"\n  ★ CartPole SOLVED at episode {ep}! avg={avg:.1f}\n")
 
     env.close()
-    agent.save("dqn_cartpole.pth")
+    agent.save(BASE_DIR / "dqn_cartpole.pth")
     _plot(scores, losses, epsilons, solved_at)
     return agent, scores
 
@@ -239,7 +243,7 @@ def _plot(scores, losses, epsilons, solved_at=None):
 
     plt.suptitle('DQN — CartPole-v1', color=colors['text'], fontsize=13)
     plt.tight_layout()
-    plt.savefig('dqn_training.png', dpi=150, bbox_inches='tight',
+    plt.savefig(BASE_DIR / 'dqn_training.png', dpi=150, bbox_inches='tight',
                 facecolor=fig.get_facecolor())
     print("Plot saved → dqn_training.png")
 
@@ -248,7 +252,7 @@ def _plot(scores, losses, epsilons, solved_at=None):
 def evaluate(n_episodes=10):
     env   = gym.make('CartPole-v1')
     agent = DQNAgent()
-    agent.load("dqn_cartpole.pth")
+    agent.load(BASE_DIR / "dqn_cartpole.pth")
     scores = []
 
     for ep in range(n_episodes):

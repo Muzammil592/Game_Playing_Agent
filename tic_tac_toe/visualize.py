@@ -2,12 +2,16 @@
 Session 2: Hyperparameter tuning + training curve visualization
 Saves plots as PNG files
 """
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from collections import deque
 from env import TicTacToeEnv
 from agent import QLearningAgent
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 def run_experiment(alpha, gamma, epsilon_decay, episodes=50_000, window=500):
@@ -162,7 +166,7 @@ def plot_single_run():
     plt.suptitle('Q-Learning Tic-Tac-Toe — Training Curves',
                  color=ax_colors['text'], fontsize=14, y=1.01)
 
-    plt.savefig('/mnt/user-data/outputs/training_curves.png',
+    plt.savefig(BASE_DIR / 'training_curves.png',
                 dpi=150, bbox_inches='tight', facecolor=fig.get_facecolor())
     print("Saved: training_curves.png")
 
@@ -218,7 +222,7 @@ def plot_hyperparam_sweep():
 
     plt.suptitle('Hyperparameter sweep', color=ax_colors['text'], fontsize=13, y=1.02)
     plt.tight_layout()
-    plt.savefig('/mnt/user-data/outputs/hyperparam_sweep.png',
+    plt.savefig(BASE_DIR / 'hyperparam_sweep.png',
                 dpi=150, bbox_inches='tight', facecolor=fig.get_facecolor())
     print("Saved: hyperparam_sweep.png")
 

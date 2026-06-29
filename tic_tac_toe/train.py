@@ -1,10 +1,14 @@
 """
 Fixed self-play training with proper reward signals for both agents.
 """
+from pathlib import Path
 import numpy as np
 from collections import deque
 from env import TicTacToeEnv
 from agent import QLearningAgent
+
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 def train(episodes=300_000, log_every=10_000):
@@ -63,8 +67,8 @@ def train(episodes=300_000, log_every=10_000):
                   f"O wins {100-wins-draws:.1f}% | "
                   f"Q-table: {len(x_agent.q_table)}")
 
-    x_agent.save("x_agent.pkl")
-    o_agent.save("o_agent.pkl")
+    x_agent.save(BASE_DIR / "x_agent.pkl")
+    o_agent.save(BASE_DIR / "o_agent.pkl")
     print("\nTraining complete!")
     return x_agent, o_agent
 
